@@ -37,7 +37,20 @@ namespace sample1
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<MyContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("MyContext")));
+                    options.UseSqlServer(Configuration.GetConnectionString("MyDB")));
+
+            services.AddIdentityServer()
+                .AddConfigurationStore(options => {
+                    options.ConfigureDbContext = a =>
+                        a.UseSqlServer(Configuration.GetConnectionString("MyAuth"));
+                })
+                .AddOperationalStore(options => {
+                    options.ConfigureDbContext = a =>
+                    a.UseSqlServer(Configuration.GetConnectionString("MyAuth"));
+
+                    // optional
+                    options.EnableTokenCleanup = true;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
